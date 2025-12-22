@@ -138,7 +138,7 @@ def load_to_bq(df: pd.DataFrame, table_name: str):
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '23/24' # Format used by ScraperFC
+    SEASON = '25/26' # Format used by ScraperFC
     
     # Generate table name: epl_2020_2021_match_shots
     # Assumption: Season '20/21' maps to 2020-2021.
