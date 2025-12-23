@@ -1,0 +1,10 @@
+# Ignore everything in this directory
+*
+
+# Except this gitignore file
+!.gitignore
+
+# And maybe a template/example profile if we had one
+!profiles.yml.example
+!README.md
+
