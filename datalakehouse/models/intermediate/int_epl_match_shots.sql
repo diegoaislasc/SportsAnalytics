@@ -12,7 +12,7 @@ transformed_shots as (
         season_id,
         
         -- Player & Team Info
-        player_name,
+        json_extract_scalar(player_name, '$.name') as player_name,
         goalkeeper,
         is_home_team,
         
@@ -28,6 +28,7 @@ transformed_shots as (
         
         -- Timing
         minute,
+        cast(floor(minute / 10) * 10 as int64) as minute_bin_10,
         added_time_minute,
         time_seconds,
         
