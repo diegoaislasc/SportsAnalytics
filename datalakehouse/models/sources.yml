@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw_data
+    description: "Raw data from EPL matches containing shot information"
+    database: sportsanalytics-mlops
+    schema: raw_data
+    tables:
+      - name: epl_2020_2021_match_shots
+        description: "Shots data for EPL 2020-2021 season"
+      - name: epl_2021_2022_match_shots
+        description: "Shots data for EPL 2021-2022 season"
+      - name: epl_2022_2023_match_shots
+        description: "Shots data for EPL 2022-2023 season"
+      - name: epl_2023_2024_match_shots
+        description: "Shots data for EPL 2023-2024 season"
+      - name: epl_2024_2025_match_shots
+        description: "Shots data for EPL 2024-2025 season" # Adjusted description assuming typo in table name (2025_2025)
+      - name: epl_2025_2026_match_shots
+        description: "Shots data for EPL 2025-2026 season"
+
