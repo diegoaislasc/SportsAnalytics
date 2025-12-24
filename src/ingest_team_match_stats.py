@@ -1,95 +1,15 @@
 import sys
 import os
-import json
 import time
 import pandas as pd
 import ScraperFC
-from ScraperFC.utils import botasaurus_browser_get_json
-from ScraperFC.sofascore import comps
-from typing import List, Dict, Any
-from google.cloud import bigquery
+from typing import List
 
 # Add src to path to allow imports from utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.utils.gcp_utils import get_bq_client, get_table_id
-
-DATASET_ID = 'raw_data'
-
-def get_season_match_ids(season: str, league: str) -> List[int]:
-    """
-    Retrieves all match IDs for a given season and league using a robust approach
-    that handles potential JSON errors from the API.
-    
-    Args:
-        season (str): Season string (e.g., '20/21').
-        league (str): League string (e.g., 'EPL').
-        
-    Returns:
-        List[int]: List of match IDs.
-    """
-    print(f"Fetching match IDs for {league} {season}...")
-    ss = ScraperFC.Sofascore()
-    
-    # Get valid seasons first
-    try:
-        valid_seasons = ss.get_valid_seasons(league)
-    except Exception as e:
-        print(f"Error getting valid seasons: {e}")
-        return []
-        
-    if season not in valid_seasons:
-        print(f"Season {season} not found in available seasons.")
-        return []
-    
-    season_id = valid_seasons[season]
-    tournament_id = comps[league]
-    
-    matches = []
-    i = 0
-    errors = 0
-    max_errors = 3
-    
-    # Custom loop to handle pagination and errors
-    while True:
-        url = f'https://api.sofascore.com/api/v1/unique-tournament/{tournament_id}/season/{season_id}/events/last/{i}'
-        try:
-            # Add rate limiting
-            time.sleep(1) 
-            
-            # This function might print errors and return None if it fails
-            response = botasaurus_browser_get_json(url)
-            
-            if response is None:
-                print(f"Warning: Received None response for page {i}. Retrying...")
-                errors += 1
-                if errors > max_errors:
-                    print("Max errors reached. Stopping.")
-                    break
-                time.sleep(2)
-                continue
-            
-            if 'events' not in response or not response['events']:
-                # End of list or empty page
-                break
-                
-            matches.extend(response['events'])
-            i += 1
-            errors = 0 # Reset errors on success
-            
-            if (i) % 5 == 0:
-                print(f"Fetched {len(matches)} matches so far (Page {i})...")
-                
-        except Exception as e:
-            print(f"Error fetching page {i}: {e}")
-            errors += 1
-            if errors > max_errors:
-                break
-            time.sleep(2)
-
-    match_ids = [m['id'] for m in matches if 'id' in m]
-    print(f"Found {len(match_ids)} matches.")
-    return match_ids
+from src.utils.sofascore_utils import get_season_match_ids, apply_sofascore_patch
+from src.utils.data_processing import clean_dataframe, load_to_bq
 
 def extract_team_match_stats(match_ids: List[int]) -> pd.DataFrame:
     """
@@ -101,6 +21,9 @@ def extract_team_match_stats(match_ids: List[int]) -> pd.DataFrame:
     Returns:
         pd.DataFrame: Combined DataFrame of all team match stats.
     """
+    # Ensure patch is applied before scraping
+    apply_sofascore_patch()
+    
     ss = ScraperFC.Sofascore()
     all_stats = []
     
@@ -131,71 +54,12 @@ def extract_team_match_stats(match_ids: List[int]) -> pd.DataFrame:
         
     return pd.concat(all_stats, ignore_index=True)
 
-def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Prepares DataFrame for BigQuery ingestion by serializing complex types to JSON strings.
-    
-    Args:
-        df (pd.DataFrame): Raw DataFrame.
-        
-    Returns:
-        pd.DataFrame: Cleaned DataFrame ready for BQ.
-    """
-    df_clean = df.copy()
-    
-    # Identify columns that are objects (likely dicts or lists) and serialize them
-    for col in df_clean.columns:
-        if df_clean[col].dtype == 'object':
-            # Check if the column actually contains dicts or lists
-            sample_series = df_clean[col].dropna()
-            if not sample_series.empty:
-                sample = sample_series.iloc[0]
-                
-                if isinstance(sample, (dict, list)):
-                    print(f"Serializing column '{col}' to JSON string.")
-                    # Convert dicts/lists to JSON strings, handle NaNs gracefully
-                    df_clean[col] = df_clean[col].apply(lambda x: json.dumps(x) if isinstance(x, (dict, list)) else x)
-                    # Ensure it's treated as string type in BQ
-                    df_clean[col] = df_clean[col].astype(str)
-                
-    return df_clean
-
-def load_to_bq(df: pd.DataFrame, table_name: str):
-    """
-    Loads a DataFrame to BigQuery.
-    
-    Args:
-        df (pd.DataFrame): Data to load.
-        table_name (str): Target table name.
-    """
-    client = get_bq_client()
-    table_id = get_table_id(DATASET_ID, table_name)
-    
-    print(f"Loading {len(df)} rows to {table_id}...")
-    
-    job_config = bigquery.LoadJobConfig(
-        autodetect=True, 
-        write_disposition="WRITE_TRUNCATE", 
-    )
-    
-    try:
-        job = client.load_table_from_dataframe(df, table_id, job_config=job_config)
-        job.result()  # Wait for the job to complete.
-        
-        table = client.get_table(table_id)
-        print(f"Loaded {table.num_rows} rows and {len(table.schema)} columns to {table_id}")
-        
-    except Exception as e:
-        print(f"BigQuery Load Failed: {e}")
-        if hasattr(e, 'errors'):
-            print(f"Errors: {e.errors}")
-
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '21/22' # Using 20/21 consistent with previous example
+    SEASON = '22/23' # Updated as per previous context
     
-    # Generate table name: epl_2020_2021_team_match_stats
+    # Generate table name: epl_2022_2023_team_match_stats
     start_year = '20' + SEASON.split('/')[0]
     end_year = '20' + SEASON.split('/')[1]
     TABLE_NAME = f"{LEAGUE.lower()}_{start_year}_{end_year}_team_match_stats"
@@ -228,4 +92,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
