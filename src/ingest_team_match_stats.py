@@ -4,6 +4,8 @@ import json
 import time
 import pandas as pd
 import ScraperFC
+from ScraperFC.utils import botasaurus_browser_get_json
+from ScraperFC.sofascore import comps
 from typing import List, Dict, Any
 from google.cloud import bigquery
 
@@ -16,7 +18,8 @@ DATASET_ID = 'raw_data'
 
 def get_season_match_ids(season: str, league: str) -> List[int]:
     """
-    Retrieves all match IDs for a given season and league using ScraperFC.
+    Retrieves all match IDs for a given season and league using a robust approach
+    that handles potential JSON errors from the API.
     
     Args:
         season (str): Season string (e.g., '20/21').
@@ -27,14 +30,66 @@ def get_season_match_ids(season: str, league: str) -> List[int]:
     """
     print(f"Fetching match IDs for {league} {season}...")
     ss = ScraperFC.Sofascore()
+    
+    # Get valid seasons first
     try:
-        match_dicts = ss.get_match_dicts(year=season, league=league)
-        match_ids = [match['id'] for match in match_dicts if 'id' in match]
-        print(f"Found {len(match_ids)} matches.")
-        return match_ids
+        valid_seasons = ss.get_valid_seasons(league)
     except Exception as e:
-        print(f"Error fetching match IDs: {e}")
+        print(f"Error getting valid seasons: {e}")
         return []
+        
+    if season not in valid_seasons:
+        print(f"Season {season} not found in available seasons.")
+        return []
+    
+    season_id = valid_seasons[season]
+    tournament_id = comps[league]
+    
+    matches = []
+    i = 0
+    errors = 0
+    max_errors = 3
+    
+    # Custom loop to handle pagination and errors
+    while True:
+        url = f'https://api.sofascore.com/api/v1/unique-tournament/{tournament_id}/season/{season_id}/events/last/{i}'
+        try:
+            # Add rate limiting
+            time.sleep(1) 
+            
+            # This function might print errors and return None if it fails
+            response = botasaurus_browser_get_json(url)
+            
+            if response is None:
+                print(f"Warning: Received None response for page {i}. Retrying...")
+                errors += 1
+                if errors > max_errors:
+                    print("Max errors reached. Stopping.")
+                    break
+                time.sleep(2)
+                continue
+            
+            if 'events' not in response or not response['events']:
+                # End of list or empty page
+                break
+                
+            matches.extend(response['events'])
+            i += 1
+            errors = 0 # Reset errors on success
+            
+            if (i) % 5 == 0:
+                print(f"Fetched {len(matches)} matches so far (Page {i})...")
+                
+        except Exception as e:
+            print(f"Error fetching page {i}: {e}")
+            errors += 1
+            if errors > max_errors:
+                break
+            time.sleep(2)
+
+    match_ids = [m['id'] for m in matches if 'id' in m]
+    print(f"Found {len(match_ids)} matches.")
+    return match_ids
 
 def extract_team_match_stats(match_ids: List[int]) -> pd.DataFrame:
     """
