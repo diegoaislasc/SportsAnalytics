@@ -35,5 +35,7 @@ models:
     +materialized: view
     staging:
       +schema: raw_data
+    intermediate:
+      +schema: intermediate
     fct:
       +schema: marts
