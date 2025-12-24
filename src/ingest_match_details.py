@@ -139,7 +139,7 @@ def load_to_bq(df: pd.DataFrame, table_name: str):
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '20/21' # Changed to a current season for testing, user can update
+    SEASON = '21/22' # Changed to a current season for testing, user can update
     
     # Generate table name: epl_2024_2025_match_details
     start_year = '20' + SEASON.split('/')[0]
