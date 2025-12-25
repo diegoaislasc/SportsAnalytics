@@ -3,7 +3,7 @@ import pandas as pd
 from google.cloud import bigquery
 from src.utils.gcp_utils import get_bq_client, get_table_id
 
-DATASET_ID = 'raw_data'
+DATASET_ID = 'bronze'
 
 def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """

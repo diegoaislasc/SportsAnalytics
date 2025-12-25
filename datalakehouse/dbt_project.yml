@@ -34,12 +34,12 @@ models:
     # Configures all models in models/ to be materialized as views by default
     +materialized: view
     staging:
-      +schema: raw_data
+      +schema: bronze
     intermediate:
-      +schema: intermediate
+      +schema: silver
     fct:
-      +schema: marts
+      +schema: gold
     ml:
-      +schema: marts
+      +schema: gold
     reporting:
-      +schema: marts
+      +schema: gold

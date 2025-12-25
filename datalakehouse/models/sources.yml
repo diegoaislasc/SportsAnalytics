@@ -1,10 +1,10 @@
 version: 2
 
 sources:
-  - name: raw_data
+  - name: bronze
     description: "Raw data from EPL matches containing shot information"
     database: sportsanalytics-mlops
-    schema: raw_data
+    schema: bronze
     tables:
       # Match Shots Tables
       - name: epl_2020_2021_match_shots

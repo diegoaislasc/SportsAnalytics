@@ -7,7 +7,7 @@ KEY_PATH = "sportsanalytics-mlops-fe23be20fcea.json"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = KEY_PATH
 
 PROJECT_ID = "sportsanalytics-mlops"
-DATASET_ID = "raw_data"
+DATASET_ID = "bronze"
 
 def check_setup():
     print(f"Checking BigQuery setup for project: {PROJECT_ID}")
@@ -24,7 +24,7 @@ def check_setup():
         except NotFound:
             print(f"Dataset '{dataset_ref}' not found. Attempting to create it...")
             dataset = bigquery.Dataset(dataset_ref)
-            dataset.location = "US"
+            dataset.location = "us-central1"
             client.create_dataset(dataset, timeout=30)
             print(f"Dataset '{dataset_ref}' created successfully.")
             
