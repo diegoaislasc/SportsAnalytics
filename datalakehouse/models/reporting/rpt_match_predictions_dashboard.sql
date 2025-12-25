@@ -22,6 +22,7 @@ match_info as (
 )
 
 select
+    m.match_id,
     m.match_date,
     m.home_team_name,
     m.away_team_name,

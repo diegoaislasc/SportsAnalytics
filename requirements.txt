@@ -21,3 +21,4 @@ lightgbm
 catboost
 mlflow
 notion-client
+streamlit
