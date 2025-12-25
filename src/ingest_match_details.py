@@ -53,11 +53,11 @@ def extract_match_details(match_ids: List[int]) -> pd.DataFrame:
         return pd.DataFrame()
         
     return pd.DataFrame(all_details)
-
+ 
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '21/22' # Changed to a current season for testing, user can update
+    SEASON = '24/25' # Changed to a current season for testing, user can update
     
     # Generate table name: epl_2021_2022_match_details
     start_year = '20' + SEASON.split('/')[0]

@@ -57,7 +57,7 @@ def extract_team_match_stats(match_ids: List[int]) -> pd.DataFrame:
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '22/23' # Updated as per previous context
+    SEASON = '25/26' # Updated as per previous context
     
     # Generate table name: epl_2022_2023_team_match_stats
     start_year = '20' + SEASON.split('/')[0]
