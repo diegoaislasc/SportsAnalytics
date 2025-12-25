@@ -39,3 +39,7 @@ models:
       +schema: intermediate
     fct:
       +schema: marts
+    ml:
+      +schema: marts
+    reporting:
+      +schema: marts

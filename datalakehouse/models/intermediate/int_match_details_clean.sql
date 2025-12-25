@@ -8,7 +8,8 @@ parsed as (
     select
         match_id,
         event_id,
-        season_name,
+        -- Parse season name from JSON (e.g., "Premier League 25/26")
+        safe_cast(json_extract_scalar(season_name, '$.name') as string) as season_name,
         match_date,
         
         -- Time Features
@@ -17,12 +18,12 @@ parsed as (
         
         -- Team Info (Parsing JSON)
         -- Extract Name
-        safe_cast(json_extract_scalar(replace(home_team_json, "'", '"'), '$.name') as string) as home_team_name,
-        safe_cast(json_extract_scalar(replace(away_team_json, "'", '"'), '$.name') as string) as away_team_name,
+        safe_cast(json_extract_scalar(home_team_json, '$.name') as string) as home_team_name,
+        safe_cast(json_extract_scalar(away_team_json, '$.name') as string) as away_team_name,
         
         -- Extract ID (Crucial for joins)
-        safe_cast(json_extract_scalar(replace(home_team_json, "'", '"'), '$.id') as int64) as home_team_id,
-        safe_cast(json_extract_scalar(replace(away_team_json, "'", '"'), '$.id') as int64) as away_team_id,
+        safe_cast(json_extract_scalar(home_team_json, '$.id') as int64) as home_team_id,
+        safe_cast(json_extract_scalar(away_team_json, '$.id') as int64) as away_team_id,
 
         -- Scores
         home_score,

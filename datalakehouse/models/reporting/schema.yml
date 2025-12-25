@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: rpt_league_standings
+    description: "Aggregated league table with actual vs expected points"
+    columns:
+      - name: team_name
+        description: "Name of the team"
+      - name: points
+        description: "Actual points earned"
+      - name: expected_points
+        description: "Expected points based on xG performance"
+
+  - name: rpt_match_predictions_dashboard
+    description: "Future match predictions with win probabilities"
+    columns:
+      - name: home_win_prob
+        description: "Probability of Home Win (0-1)"
+      - name: away_win_prob
+        description: "Probability of Away Win (0-1)"
+
+  - name: rpt_player_performance
+    description: "Player stats focusing on xG and finishing"
+    columns:
+      - name: total_goals
+        description: "Total goals scored in season"
+      - name: total_xg
+        description: "Total Expected Goals"
+
+  - name: rpt_match_momentum
+    description: "Minute-by-minute cumulative xG for match flow analysis"
+    columns:
+      - name: minute
+        description: "Match minute"
+      - name: cumulative_xg_home
+        description: "Running total of Home xG up to this minute"
+

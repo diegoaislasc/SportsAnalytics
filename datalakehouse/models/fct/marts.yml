@@ -1,7 +1,7 @@
 version: 2
 
 models:
-  - name: fct_matches
+  - name: fct_epl_matches
     description: >
       Final fact table for EPL matches (Marts Layer).
       Joins match context (teams, scores, venue) with pivoted statistics (possession, xG, shots).

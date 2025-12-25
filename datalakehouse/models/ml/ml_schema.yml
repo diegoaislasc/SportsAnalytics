@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: int_team_history_spine
+    description: "Unpivoted view of matches from each team's perspective"
+    columns:
+      - name: team_id
+        description: "ID of the focus team"
+      - name: match_id
+        description: "Match identifier"
+      - name: is_home
+        description: "Boolean indicating if the focus team was playing at home"
+
+  - name: int_team_rolling_stats
+    description: "Rolling window statistics for teams (Form & Season-to-Date)"
+    columns:
+      - name: rolling_5_xg_for
+        description: "Average xG created in the last 5 matches"
+      - name: season_total_points
+        description: "Total points accumulated in the current season up to this match"
+
+  - name: ml_match_training_data
+    description: "Training dataset for match winner prediction, joining Home vs Away rolling stats"
+    columns:
+      - name: label
+        description: "Target variable: 1=Home Win, 2=Away Win, 0=Draw (mapped from winner_code)"
+
