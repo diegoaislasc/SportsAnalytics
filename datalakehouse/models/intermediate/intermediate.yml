@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: int_match_details_clean
+    description: >
+      Cleaned version of match details. Parses JSON strings for teams/venues and calculates derived fields.
+    columns:
+      - name: match_id
+        tests:
+          - unique
+          - not_null
+      - name: home_team_name
+        description: "Parsed name of the home team."
+      - name: away_team_name
+        description: "Parsed name of the away team."
+      - name: total_goals
+        description: "Sum of home and away scores."
+      - name: result
+        description: "Categorical result: 'Home', 'Away', or 'Draw'."
+
+  - name: int_team_stats_pivoted
+    description: >
+      Pivoted table of match statistics. Converts long format (one row per metric) to wide format (one column per metric).
+      Essential for ML feature engineering.
+    columns:
+      - name: match_id
+        tests:
+          - unique
+          - not_null
+      - name: home_possession
+        description: "Ball possession percentage for home team."
+      - name: home_xg
+        description: "Total Expected Goals for home team."
+      - name: home_shots_on_target
+        description: "Count of shots on target for home team."
+
+  - name: int_epl_match_shots
+    description: >
+      Enriched shots data with boolean flags for analysis (is_goal, is_header, etc.).
+      Parses player names from JSON.
+    columns:
+      - name: shot_id
+        tests:
+          - unique
+          - not_null
+      - name: is_goal
+        description: "Boolean flag (1/0): Was the shot a goal?"
+      - name: is_on_target
+        description: "Boolean flag (1/0): Was the shot on target (Goal, Save, Blocked)?"
+      - name: minute_bin_10
+        description: "Shot time grouped into 10-minute buckets (0, 10, 20...)."
+
+  - name: int_match_shots_imputed
+    description: >
+      Contains xG predictions for the 2020-2021 season (where data was missing), generated via BQML.
+      Unifies actual xG (2021-2026) with predicted xG (2020-2021).
+    columns:
+      - name: imputed_xg
+        description: "Best available xG value (Actual if available, Predicted if not)."
+      - name: is_imputed
+        description: "Boolean flag: TRUE if xG was predicted by the ML model."
+

@@ -6,6 +6,7 @@ sources:
     database: sportsanalytics-mlops
     schema: raw_data
     tables:
+      # Match Shots Tables
       - name: epl_2020_2021_match_shots
         description: "Shots data for EPL 2020-2021 season"
       - name: epl_2021_2022_match_shots
@@ -15,7 +16,34 @@ sources:
       - name: epl_2023_2024_match_shots
         description: "Shots data for EPL 2023-2024 season"
       - name: epl_2024_2025_match_shots
-        description: "Shots data for EPL 2024-2025 season" # Adjusted description assuming typo in table name (2025_2025)
+        description: "Shots data for EPL 2024-2025 season"
       - name: epl_2025_2026_match_shots
         description: "Shots data for EPL 2025-2026 season"
 
+      # Match Details Tables
+      - name: epl_2020_2021_match_details
+        description: "Match metadata/details for EPL 2020-2021 season"
+      - name: epl_2021_2022_match_details
+        description: "Match metadata/details for EPL 2021-2022 season"
+      - name: epl_2022_2023_match_details
+        description: "Match metadata/details for EPL 2022-2023 season"
+      - name: epl_2023_2024_match_details
+        description: "Match metadata/details for EPL 2023-2024 season"
+      - name: epl_2024_2025_match_details
+        description: "Match metadata/details for EPL 2024-2025 season"
+      - name: epl_2025_2026_match_details
+        description: "Match metadata/details for EPL 2025-2026 season"
+
+      # Team Match Stats Tables
+      - name: epl_2020_2021_team_match_stats
+        description: "Aggregated team statistics for EPL 2020-2021 season"
+      - name: epl_2021_2022_team_match_stats
+        description: "Aggregated team statistics for EPL 2021-2022 season"
+      - name: epl_2022_2023_team_match_stats
+        description: "Aggregated team statistics for EPL 2022-2023 season"
+      - name: epl_2023_2024_team_match_stats
+        description: "Aggregated team statistics for EPL 2023-2024 season"
+      - name: epl_2024_2025_team_match_stats
+        description: "Aggregated team statistics for EPL 2024-2025 season"
+      - name: epl_2025_2026_team_match_stats
+        description: "Aggregated team statistics for EPL 2025-2026 season"
