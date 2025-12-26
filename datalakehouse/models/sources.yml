@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: bronze
+  - name: raw_data
     description: "Raw data from EPL matches containing shot information"
     database: sportsanalytics-mlops
     schema: bronze

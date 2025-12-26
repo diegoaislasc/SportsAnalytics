@@ -24,7 +24,7 @@ def check_setup():
         except NotFound:
             print(f"Dataset '{dataset_ref}' not found. Attempting to create it...")
             dataset = bigquery.Dataset(dataset_ref)
-            dataset.location = "us-central1"
+            dataset.location = "US"
             client.create_dataset(dataset, timeout=30)
             print(f"Dataset '{dataset_ref}' created successfully.")
             

@@ -27,7 +27,7 @@ client = get_bq_client()
 def get_teams():
     query = """
         SELECT distinct team_name 
-        FROM `sportsanalytics-mlops.intermediate.int_team_history_spine`
+        FROM `sportsanalytics-mlops.silver.int_team_history_spine`
         ORDER BY 1
     """
     return client.query(query).to_dataframe()['team_name'].tolist()
@@ -37,7 +37,7 @@ def get_latest_stats(team_name, match_date):
     query = f"""
         WITH team_id_lookup AS (
             SELECT DISTINCT team_id 
-            FROM `sportsanalytics-mlops.intermediate.int_team_history_spine`
+            FROM `sportsanalytics-mlops.silver.int_team_history_spine`
             WHERE team_name = '{team_name}'
         )
         SELECT 
@@ -46,7 +46,7 @@ def get_latest_stats(team_name, match_date):
             rolling_5_points,
             season_avg_xg_for,
             season_total_points
-        FROM `sportsanalytics-mlops.intermediate.int_team_rolling_stats` stats
+        FROM `sportsanalytics-mlops.silver.int_team_rolling_stats` stats
         JOIN team_id_lookup t ON stats.team_id = t.team_id
         WHERE match_date < '{match_date}'
         ORDER BY match_date DESC
@@ -70,7 +70,7 @@ def predict_match(home_team, away_team, match_date):
     points_diff = home_stats['season_total_points'] - away_stats['season_total_points']
     
     predict_query = f"""
-        SELECT * FROM ML.PREDICT(MODEL `sportsanalytics-mlops.marts.match_winner_model`, (
+        SELECT * FROM ML.PREDICT(MODEL `sportsanalytics-mlops.gold.match_winner_model`, (
             SELECT 
                 {home_stats['rolling_5_goals_for']} as home_form_goals,
                 {home_stats['rolling_5_xg_for']} as home_form_xg,

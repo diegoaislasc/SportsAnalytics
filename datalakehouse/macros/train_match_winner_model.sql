@@ -1,7 +1,7 @@
 {% macro train_match_winner_model() %}
 
 {% set sql %}
-CREATE OR REPLACE MODEL `marts.match_winner_model`
+CREATE OR REPLACE MODEL `gold.match_winner_model`
 OPTIONS(
     model_type='LOGISTIC_REG',
     input_label_cols=['label'],

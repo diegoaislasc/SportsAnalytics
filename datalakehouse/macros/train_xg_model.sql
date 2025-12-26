@@ -1,7 +1,7 @@
 {% macro train_xg_model() %}
 
     {% set build_model_query %}
-        CREATE OR REPLACE MODEL `{{ target.project }}.marts.xg_model`
+        CREATE OR REPLACE MODEL `{{ target.project }}.gold.xg_model`
         OPTIONS(
             model_type='LINEAR_REG',
             input_label_cols=['xg'],

@@ -5,7 +5,7 @@ with future_matches as (
     -- Using the ML.PREDICT output we generated or can generate on the fly
     select
         *
-    from ML.PREDICT(MODEL `marts.match_winner_model`, (
+    from ML.PREDICT(MODEL `gold.match_winner_model`, (
         select * from {{ ref('ml_match_training_data') }}
         -- In a real scenario, we'd filter for match_date >= current_date()
         -- For this MVP, we include everything to populate the dashboard with data
