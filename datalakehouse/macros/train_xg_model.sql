@@ -3,9 +3,8 @@
     {% set build_model_query %}
         CREATE OR REPLACE MODEL `{{ target.project }}.gold.xg_model`
         OPTIONS(
-            model_type='LINEAR_REG',
+            model_type='BOOSTED_TREE_REGRESSOR',
             input_label_cols=['xg'],
-            min_rel_progress=0.01,
             max_iterations=50
         ) AS
         SELECT
@@ -24,7 +23,7 @@
     {% endset %}
 
     {% do run_query(build_model_query) %}
-    {{ log("Successfully trained xG model: marts.xg_model", info=True) }}
+    {{ log("Successfully trained xG model: gold.xg_model", info=True) }}
 
 {% endmacro %}
 

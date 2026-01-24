@@ -57,37 +57,38 @@ def extract_match_details(match_ids: List[int]) -> pd.DataFrame:
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '20/21' # Changed to a current season for testing, user can update
+    SEASONS = ['20/21', '21/22', '22/23', '23/24', '24/25', '25/26']
     
-    # Generate table name: epl_2021_2022_match_details
-    start_year = '20' + SEASON.split('/')[0]
-    end_year = '20' + SEASON.split('/')[1]
-    TABLE_NAME = f"{LEAGUE.lower()}_{start_year}_{end_year}_match_details"
-    
-    print(f"--- Starting Ingestion Pipeline for {LEAGUE} {SEASON} ---")
-    
-    # 1. Get Match IDs
-    match_ids = get_season_match_ids(SEASON, LEAGUE)
-    
-    if not match_ids:
-        print("No matches found. Exiting.")
-        return
-
-    # 2. Extract Data
-    df_details = extract_match_details(match_ids)
-    
-    if df_details.empty:
-        print("No match details extracted. Exiting.")
-        return
+    for SEASON in SEASONS:
+        # Generate table name
+        start_year = '20' + SEASON.split('/')[0]
+        end_year = '20' + SEASON.split('/')[1]
+        TABLE_NAME = f"{LEAGUE.lower()}_{start_year}_{end_year}_match_details"
         
-    print(f"Extracted {len(df_details)} rows of match details.")
-    
-    # 3. Transform Data
-    df_clean = clean_dataframe(df_details)
-    
-    # 4. Load to BigQuery
-    load_to_bq(df_clean, TABLE_NAME)
-    
+        print(f"--- Starting Ingestion Pipeline for {LEAGUE} {SEASON} ---")
+        
+        # 1. Get Match IDs
+        match_ids = get_season_match_ids(SEASON, LEAGUE)
+        
+        if not match_ids:
+            print(f"No matches found for {SEASON}. Skipping.")
+            continue
+
+        # 2. Extract Data
+        df_details = extract_match_details(match_ids)
+        
+        if df_details.empty:
+            print(f"No match details extracted for {SEASON}. Skipping.")
+            continue
+            
+        print(f"Extracted {len(df_details)} rows of match details for {SEASON}.")
+        
+        # 3. Transform Data
+        df_clean = clean_dataframe(df_details)
+        
+        # 4. Load to BigQuery
+        load_to_bq(df_clean, TABLE_NAME)
+        
     print("--- Pipeline Completed Successfully ---")
 
 if __name__ == "__main__":

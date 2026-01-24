@@ -9,7 +9,7 @@ predictions as (
     select
         *
     from ml.predict(
-        model `{{ target.project }}.marts.xg_model`,
+        model `{{ target.project }}.gold.xg_model`,
         (
             select 
                 match_id, shot_id, season_id,

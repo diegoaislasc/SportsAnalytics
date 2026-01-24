@@ -57,38 +57,38 @@ def extract_match_shots(match_ids: List[int]) -> pd.DataFrame:
 def main():
     # Configuration
     LEAGUE = 'EPL'
-    SEASON = '20/21' # Format used by ScraperFC - Keeping original config or update as needed
+    SEASONS = ['20/21', '21/22', '22/23', '23/24', '24/25', '25/26']
     
-    # Generate table name: epl_2020_2021_match_shots
-    # Assumption: Season '20/21' maps to 2020-2021.
-    start_year = '20' + SEASON.split('/')[0]
-    end_year = '20' + SEASON.split('/')[1]
-    TABLE_NAME = f"{LEAGUE.lower()}_{start_year}_{end_year}_match_shots"
-    
-    print(f"--- Starting Ingestion Pipeline for {LEAGUE} {SEASON} ---")
-    
-    # 1. Get Match IDs
-    match_ids = get_season_match_ids(SEASON, LEAGUE)
-    
-    if not match_ids:
-        print("No matches found. Exiting.")
-        return
-
-    # 2. Extract Data
-    df_shots = extract_match_shots(match_ids)
-    
-    if df_shots.empty:
-        print("No shots data extracted. Exiting.")
-        return
+    for SEASON in SEASONS:
+        # Generate table name: epl_2020_2021_match_shots
+        start_year = '20' + SEASON.split('/')[0]
+        end_year = '20' + SEASON.split('/')[1]
+        TABLE_NAME = f"{LEAGUE.lower()}_{start_year}_{end_year}_match_shots"
         
-    print(f"Extracted {len(df_shots)} rows of shots data.")
-    
-    # 3. Transform Data
-    df_clean = clean_dataframe(df_shots)
-    
-    # 4. Load to BigQuery
-    load_to_bq(df_clean, TABLE_NAME)
-    
+        print(f"--- Starting Ingestion Pipeline for {LEAGUE} {SEASON} ---")
+        
+        # 1. Get Match IDs
+        match_ids = get_season_match_ids(SEASON, LEAGUE)
+        
+        if not match_ids:
+            print(f"No matches found for {SEASON}. Skipping.")
+            continue
+
+        # 2. Extract Data
+        df_shots = extract_match_shots(match_ids)
+        
+        if df_shots.empty:
+            print(f"No shots data extracted for {SEASON}. Skipping.")
+            continue
+            
+        print(f"Extracted {len(df_shots)} rows of shots data for {SEASON}.")
+        
+        # 3. Transform Data
+        df_clean = clean_dataframe(df_shots)
+        
+        # 4. Load to BigQuery
+        load_to_bq(df_clean, TABLE_NAME)
+        
     print("--- Pipeline Completed Successfully ---")
 
 if __name__ == "__main__":

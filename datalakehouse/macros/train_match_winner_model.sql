@@ -3,9 +3,9 @@
 {% set sql %}
 CREATE OR REPLACE MODEL `gold.match_winner_model`
 OPTIONS(
-    model_type='LOGISTIC_REG',
+    model_type='BOOSTED_TREE_CLASSIFIER',
     input_label_cols=['label'],
-    max_iterations=20
+    max_iterations=50
 ) AS
 SELECT
     label,

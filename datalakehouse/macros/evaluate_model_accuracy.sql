@@ -2,7 +2,7 @@
 
     -- 1. Train Backtest Model (up to 2024-08-16)
     {% set train_sql %}
-        CREATE OR REPLACE MODEL `marts.match_winner_model_backtest`
+        CREATE OR REPLACE MODEL `gold.match_winner_model_backtest`
         OPTIONS(
             model_type='LOGISTIC_REG',
             input_label_cols=['label'],
@@ -30,7 +30,7 @@
 
     -- 2. Evaluate Metrics
     {% set eval_query %}
-        SELECT * FROM ML.EVALUATE(MODEL `marts.match_winner_model_backtest`, (
+        SELECT * FROM ML.EVALUATE(MODEL `gold.match_winner_model_backtest`, (
             SELECT * FROM {{ ref('ml_match_training_data') }}
             WHERE match_date >= '2024-08-16'
         ))
@@ -50,7 +50,7 @@
             predicted.predicted_label_probs[OFFSET(0)].prob as prob_win,
             input.home_form_points,
             input.away_form_points
-        FROM ML.PREDICT(MODEL `marts.match_winner_model_backtest`, (
+        FROM ML.PREDICT(MODEL `gold.match_winner_model_backtest`, (
             SELECT * FROM {{ ref('ml_match_training_data') }}
             WHERE match_date >= '2024-08-16'
         )) as predicted
